@@ -10,7 +10,7 @@ app.use(express.json());
 app.use(express.static('public-lesson8'));
 
 // Отладка
-console.log('DATABASE_URL:', process.env.DATABASE_URL ? 'есть' : 'ОТСУТСТВУЕТ');
+console.log('DATABASE_URL начало:', url ? url.substring(0, 30) : 'ОТСУТСТВУЕТ');
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
@@ -22,8 +22,10 @@ app.get('/tasks', async (req, res) => {
     const result = await pool.query('SELECT * FROM tasks ORDER BY id');
     res.json(result.rows);
   } catch (err) {
-    console.error('Ошибка:', err.message);
-    res.status(500).json({ error: err.message });
+    console.error('Ошибка полная:', JSON.stringify(err, null, 2));
+    console.error('Ошибка message:', err.message);
+    console.error('Ошибка code:', err.code);
+    res.status(500).json({ error: err.message, code: err.code });
   }
 });
 
