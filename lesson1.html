@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Карточка</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: #f0f0f0;
+    }
+
+    .card {
+      background: white;
+      padding: 32px;
+      border-radius: 16px;
+      text-align: center;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      width: 260px;
+    }
+
+    .avatar {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: #6c63ff;
+      color: white;
+      font-size: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px;
+    }
+
+    button {
+      margin-top: 16px;
+      padding: 10px 24px;
+      border: none;
+      border-radius: 8px;
+      background: #6c63ff;
+      color: white;
+      font-size: 15px;
+      cursor: pointer;
+    }
+
+    /* TODO: добавь стиль для кнопки когда она "активна" — другой цвет */
+    button.active {
+      background: #e74c3c;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="avatar">АИ</div>
+    <h2>Алексей Иванов</h2>
+    <p>Фронтенд разработчик</p>
+    <p>Нажатий: <strong id="count">0</strong></p>
+    <button id="btn" onclick="handleClick()">Подписаться</button>
+  </div>
+
+  <script>
+    let count = 0;
+    let subscribed = false;
+
+    function handleClick() {
+      count++;
+      document.getElementById('count').textContent = count;
+
+      // TODO: если subscribed === false:
+      //   - поменяй текст кнопки на "Отписаться"
+      //   - поменяй цвет кнопки на красный (#e74c3c)
+      //   - установи subscribed = true
+      // иначе:
+      //   - верни текст "Подписаться"
+      //   - верни цвет #6c63ff
+      //   - установи subscribed = false
+        btn.classList.toggle('active');
+        subscribed = !subscribed;
+        btn.textContent = subscribed ? 'Отписаться' : 'Подписаться';
+    }
+  </script>
+</body>
+</html>

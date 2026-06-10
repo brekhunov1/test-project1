@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Todo App</title>
+  <style>
+    body { font-family: sans-serif; max-width: 400px; margin: 40px auto; padding: 0 16px; background: #f5f5f5; }
+    .input-row { display: flex; gap: 8px; margin-bottom: 16px; }
+    input { flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px; }
+    button { padding: 10px 16px; background: #6c63ff; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 15px; }
+    .todo-item { display: flex; align-items: center; justify-content: space-between; background: white; padding: 12px 16px; border-radius: 8px; margin-bottom: 8px; }
+    .todo-item span { cursor: pointer; flex: 1; }
+    .todo-item span.done { text-decoration: line-through; color: #999; }
+    .delete-btn { background: none; color: #e74c3c; padding: 4px 8px; font-size: 18px; border: none; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <h2>Мои задачи</h2>
+  <div class="input-row">
+    <input id="new-task" placeholder="Новая задача..." />
+    <button onclick="addTask()">+</button>
+  </div>
+  <div id="task-list"></div>
+
+  <script>
+    const API = 'http://localhost:3000/tasks';
+
+    function render(tasks) {
+      const list = document.getElementById('task-list');
+      list.innerHTML = '';
+      tasks.forEach(task => {
+        const item = document.createElement('div');
+        item.className = 'todo-item';
+        const span = document.createElement('span');
+        span.textContent = task.text;
+        if (task.done) span.classList.add('done');
+        span.onclick = () => toggleTask(task.id);
+        const btn = document.createElement('button');
+        btn.className = 'delete-btn';
+        btn.textContent = '✕';
+        btn.onclick = () => deleteTask(task.id);
+        item.appendChild(span);
+        item.appendChild(btn);
+        list.appendChild(item);
+      });
+    }
+
+    async function loadTasks() {
+      // TODO: fetch GET /tasks → вызови render() с полученными данными
+      try {
+        const response = await fetch(API);
+        if (!response.ok) {
+          throw new Error(`Ошибка сервера: ${response.status}`);
+        }
+        const tasks = await response.json();
+        render(tasks);
+      } catch (error) {
+        alert('Не удалось загрузить задачи: ' + error.message);
+      }
+    }
+
+    async function addTask() {
+      const input = document.getElementById('new-task');
+      const text = input.value.trim();
+      if (!text) return;
+
+      // TODO: fetch POST /tasks с телом { text }
+      // после успеха: очисти input, вызови loadTasks()
+      // подсказка:
+      // await fetch(API, {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify({ text })
+      // })
+      try {
+        const response = await fetch(API, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text })
+        });
+        if (!response.ok) {
+          throw new Error(`Ошибка сервера: ${response.status}`);
+        }
+        input.value = '';
+        loadTasks();
+      } catch (error) {
+        alert('Не удалось добавить задачу: ' + error.message);
+      }
+    }
+
+    async function toggleTask(id) {
+      // TODO: fetch PATCH /tasks/:id
+      // после успеха: вызови loadTasks()
+      try {
+        const response = await fetch(`${API}/${id}`, { method: 'PATCH' });
+        if (!response.ok) {
+          throw new Error(`Ошибка сервера: ${response.status}`);
+        }
+        loadTasks();
+      } catch (error) {
+        alert('Не удалось обновить задачу: ' + error.message);
+      }
+    }
+
+    async function deleteTask(id) {
+      // TODO: fetch DELETE /tasks/:id
+      // после успеха: вызови loadTasks()
+      try {
+        const response = await fetch(`${API}/${id}`, { method: 'DELETE' });
+        if (!response.ok) {
+          throw new Error(`Ошибка сервера: ${response.status}`);
+        }
+        loadTasks();
+      } catch (error) {
+        alert('Не удалось удалить задачу: ' + error.message);
+      }
+    }
+
+    // Загрузить задачи при старте + Enter для добавления
+    loadTasks();
+    document.getElementById('new-task').addEventListener('keydown', e => {
+      if (e.key === 'Enter') addTask();
+    });
+  </script>
+</body>
+</html>

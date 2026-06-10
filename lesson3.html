@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Пользователи</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      max-width: 600px;
+      margin: 40px auto;
+      padding: 0 16px;
+      background: #f5f5f5;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .card {
+      background: white;
+      padding: 16px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    .card h3 { margin: 0 0 8px; font-size: 15px; }
+    .card p  { margin: 0 0 4px; font-size: 13px; color: #666; }
+    .status  { text-align: center; padding: 40px; color: #999; }
+    .error   { color: #e74c3c; }
+  </style>
+</head>
+<body>
+  <h2>Пользователи</h2>
+  <div id="app" class="status">Загрузка...</div>
+
+  <script>
+    async function loadUsers() {
+      const app = document.getElementById('app');
+
+      // TODO: оберни в try/catch
+      // внутри try:
+      //   1. сделай fetch запрос к 'https://jsonplaceholder.typicode.com/users'
+      //   2. преобразуй ответ в JSON (.json())
+      //   3. смени класс app на 'grid'
+      //   4. для каждого пользователя создай карточку и добавь в app
+      //      карточка содержит: имя (user.name), email (user.email), город (user.address.city)
+      // в catch:
+      //   покажи сообщение об ошибке с классом 'error'
+      try {
+        const response = await fetch('https://jsonplaceholder.typicode.com/users');
+
+        if (!response.ok) {
+          throw new Error(`Ошибка сервера: ${response.status}`);
+        }
+    
+        const users = await response.json();
+        app.className = 'grid';
+        
+        users.forEach(user => {
+          const card = document.createElement('div');
+          card.className = 'card';
+          card.innerHTML = `
+            <h3>${user.name}</h3>
+            <p>${user.email}</p>
+            <p>${user.address.city}</p>
+          `;
+          app.appendChild(card);
+          
+        });
+      } catch (error) {
+        app.className = 'error';
+        app.textContent = 'Ошибка загрузки данных';
+        console.error('Ошибка:', error);
+      }
+    }
+
+    app.innerHTML = '';
+    app.className = 'grid';
+    loadUsers();
+  </script>
+</body>
+</html>

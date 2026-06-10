@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Todo List</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      max-width: 400px;
+      margin: 40px auto;
+      padding: 0 16px;
+      background: #f5f5f5;
+    }
+    .input-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    input {
+      flex: 1;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 15px;
+    }
+    button {
+      padding: 10px 16px;
+      background: #6c63ff;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 15px;
+    }
+    .todo-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: white;
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin-bottom: 8px;
+    }
+    .todo-item span {
+      cursor: pointer;
+      flex: 1;
+    }
+    /* TODO: стиль для выполненной задачи — зачёркнутый текст, серый цвет */
+    .todo-item span.done {
+      text-decoration: line-through;
+      color: #999;
+    }
+
+    .delete-btn {
+      background: none;
+      color: #e74c3c;
+      padding: 4px 8px;
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+  <h2>Мои задачи</h2>
+  <div class="input-row">
+    <input id="new-task" placeholder="Новая задача..." />
+    <button onclick="addTask()">+</button>
+  </div>
+  <div id="task-list"></div>
+
+  <script>
+    // Массив объектов — каждая задача это { id, text, done }
+    let tasks = [
+      { id: 1, text: 'Выучить HTML/CSS', done: true },
+      { id: 2, text: 'Изучить JavaScript', done: false },
+    ];
+
+    function render() {
+      const list = document.getElementById('task-list');
+      list.innerHTML = '';
+
+      // TODO: пройдись по массиву tasks через forEach
+      // для каждой задачи создай div с классом 'todo-item'
+      // внутри: span с текстом задачи (если done — добавь класс 'done')
+      //         кнопка удаления ✕ с классом 'delete-btn'
+      // добавь div в list
+
+      tasks.forEach(task => {
+        const item = document.createElement('div');
+        item.className = 'todo-item';
+
+        const span = document.createElement('span');
+        span.textContent = task.text;
+        if (task.done) {
+          span.classList.add('done');
+        }
+        span.onclick = () => toggleTask(task.id);
+
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'delete-btn';
+        deleteBtn.textContent = '✕';
+        deleteBtn.onclick = () => deleteTask(task.id);
+
+        item.appendChild(span);
+        item.appendChild(deleteBtn);
+        list.appendChild(item);
+      });
+    }
+
+    function addTask() {
+      const input = document.getElementById('new-task');
+      const text = input.value.trim();
+
+      // TODO: если text пустой — ничего не делать (return)
+      // создай новый объект задачи { id: Date.now(), text, done: false }
+      // добавь его в массив tasks
+      // очисти поле ввода
+      // вызови render()
+      if (text === '') {
+        return;
+      }
+
+      const newTask = { id: Date.now(), text, done: false };
+      tasks.push(newTask);
+      input.value = '';
+      render();
+    }
+
+    function toggleTask(id) {
+      // TODO: найди задачу в массиве по id
+      // переключи её done (true → false, false → true)
+      // вызови render()
+      const task = tasks.find(t => t.id === id);
+      if (task) {
+        task.done = !task.done;
+        render();
+      }
+    }
+
+    function deleteTask(id) {
+      // TODO: удали задачу из массива tasks по id
+      // подсказка: используй filter()
+      // вызови render()
+      tasks = tasks.filter(t => t.id !== id);
+      render();
+    }
+
+    render(); // первый рендер при загрузке
+    document.getElementById('new-task').addEventListener('keydown', e => {
+      if (e.key === 'Enter') addTask();
+    });
+  </script>
+</body>
+</html>
