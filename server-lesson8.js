@@ -10,11 +10,8 @@ app.use(express.json());
 app.use(express.static('public-lesson8')); // ← отдаёт файлы из папки public
 
 const pool = new Pool({
-  user: 'denis',
-  host: 'localhost',
-  database: 'todoapp',
-  password: '',
-  port: 5432,
+  connectionString: process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false }
 });
 
 app.get('/tasks', async (req, res) => {
