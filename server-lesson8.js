@@ -7,7 +7,7 @@ const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
-app.use(express.static('public-lesson8'));
+app.use(express.static('publick-lesson8'));
 
 // Отладка
 const dbUrl = process.env.DATABASE_URL;
