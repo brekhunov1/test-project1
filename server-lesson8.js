@@ -10,7 +10,8 @@ app.use(express.json());
 app.use(express.static('public-lesson8'));
 
 // Отладка
-console.log('DATABASE_URL начало:', url ? url.substring(0, 30) : 'ОТСУТСТВУЕТ');
+const dbUrl = process.env.DATABASE_URL;
+console.log('DATABASE_URL начало:', dbUrl ? dbUrl.substring(0, 30) : 'ОТСУТСТВУЕТ');
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
