@@ -7,7 +7,7 @@ const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
-app.use(express.static('publick-lesson8'));
+app.use(express.static('public'));
 
 // Отладка
 const dbUrl = process.env.DATABASE_URL;
@@ -20,13 +20,11 @@ const pool = new Pool({
 
 app.get('/tasks', async (req, res) => {
   try {
-    const result = await pool.query('SELECT * FROM tasks ORDER BY id');
+    const result = await pool.query('SELECT * FROM tasks ORDER BY created_at ASC');
     res.json(result.rows);
   } catch (err) {
-    console.error('Ошибка полная:', JSON.stringify(err, null, 2));
-    console.error('Ошибка message:', err.message);
-    console.error('Ошибка code:', err.code);
-    res.status(500).json({ error: err.message, code: err.code });
+    console.error('Ошибка:', err.message);
+    res.status(500).json({ error: err.message });
   }
 });
 

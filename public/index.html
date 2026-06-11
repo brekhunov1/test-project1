@@ -35,6 +35,8 @@
         span.textContent = task.text;
         if (task.done) span.classList.add('done');
         span.onclick = () => toggleTask(task.id);
+        const date = new Date(task.created_at).toLocaleDateString('ru-RU');
+        span.title = `Создано: ${date}`;
         const btn = document.createElement('button');
         btn.className = 'delete-btn';
         btn.textContent = '✕';
