@@ -1,13 +1,17 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const { Pool } = require('pg');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const authRouter = require('./auth');
+const authMiddleware = require('./middleware');
 
 app.use(cors());
 app.use(express.json());
 app.use(express.static('public'));
+app.use('/auth', authRouter);
 
 // Отладка
 const dbUrl = process.env.DATABASE_URL;
@@ -15,10 +19,10 @@ console.log('DATABASE_URL начало:', dbUrl ? dbUrl.substring(0, 30) : 'ОТ
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false }
+  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
 });
 
-app.get('/tasks', async (req, res) => {
+app.get('/tasks', authMiddleware, async (req, res) => {
   try {
     const result = await pool.query('SELECT * FROM tasks ORDER BY created_at ASC');
     res.json(result.rows);
@@ -28,7 +32,7 @@ app.get('/tasks', async (req, res) => {
   }
 });
 
-app.post('/tasks', async (req, res) => {
+app.post('/tasks', authMiddleware, async (req, res) => {
   try {
     const { text } = req.body;
     if (!text) return res.status(400).json({ error: 'Текст обязателен' });
@@ -39,7 +43,7 @@ app.post('/tasks', async (req, res) => {
   }
 });
 
-app.patch('/tasks/:id', async (req, res) => {
+app.patch('/tasks/:id', authMiddleware, async (req, res) => {
   try {
     const { id } = req.params;
     const result = await pool.query('UPDATE tasks SET done = NOT done WHERE id = $1 RETURNING *', [id]);
@@ -49,7 +53,7 @@ app.patch('/tasks/:id', async (req, res) => {
   }
 });
 
-app.delete('/tasks/:id', async (req, res) => {
+app.delete('/tasks/:id', authMiddleware, async (req, res) => {
   try {
     const { id } = req.params;
     await pool.query('DELETE FROM tasks WHERE id = $1', [id]);
