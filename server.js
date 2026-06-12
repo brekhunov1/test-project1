@@ -24,10 +24,12 @@ const pool = new Pool({
 
 app.get('/tasks', authMiddleware, async (req, res) => {
   try {
-    const result = await pool.query('SELECT * FROM tasks ORDER BY created_at ASC');
+    const result = await pool.query(
+      'SELECT * FROM tasks WHERE user_id = $1 ORDER BY created_at ASC',
+      [req.userId]
+    );
     res.json(result.rows);
   } catch (err) {
-    console.error('Ошибка:', err.message);
     res.status(500).json({ error: err.message });
   }
 });
@@ -36,7 +38,10 @@ app.post('/tasks', authMiddleware, async (req, res) => {
   try {
     const { text } = req.body;
     if (!text) return res.status(400).json({ error: 'Текст обязателен' });
-    const result = await pool.query('INSERT INTO tasks (text) VALUES ($1) RETURNING *', [text]);
+    const result = await pool.query(
+      'INSERT INTO tasks (text, user_id) VALUES ($1, $2) RETURNING *',
+      [text, req.userId]
+    );
     res.status(201).json(result.rows[0]);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -46,7 +51,11 @@ app.post('/tasks', authMiddleware, async (req, res) => {
 app.patch('/tasks/:id', authMiddleware, async (req, res) => {
   try {
     const { id } = req.params;
-    const result = await pool.query('UPDATE tasks SET done = NOT done WHERE id = $1 RETURNING *', [id]);
+    const result = await pool.query(
+      'UPDATE tasks SET done = NOT done WHERE id = $1 AND user_id = $2 RETURNING *',
+      [id, req.userId]
+    );
+    if (!result.rows[0]) return res.status(404).json({ error: 'Не найдена' });
     res.json(result.rows[0]);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -56,7 +65,10 @@ app.patch('/tasks/:id', authMiddleware, async (req, res) => {
 app.delete('/tasks/:id', authMiddleware, async (req, res) => {
   try {
     const { id } = req.params;
-    await pool.query('DELETE FROM tasks WHERE id = $1', [id]);
+    await pool.query(
+      'DELETE FROM tasks WHERE id = $1 AND user_id = $2',
+      [id, req.userId]
+    );
     res.json({ message: 'Удалена' });
   } catch (err) {
     res.status(500).json({ error: err.message });
